@@ -1,0 +1,9 @@
+{
+  "name": "platform",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix apps/api",
+    "start": "npm start --prefix apps/api"
+  }
+}
