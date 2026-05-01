@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { env } from './config/env.js';
 import { errorHandler } from './middlewares/error.middleware.js';
+import passport from './config/passport.js';
 
 import authRoutes          from './modules/auth/auth.routes.js';
 import problemsRoutes      from './modules/problems/problems.routes.js';
@@ -17,6 +18,7 @@ export function createApp() {
   app.use(helmet());
   app.use(cors());
   app.use(express.json());
+  app.use(passport.initialize());
   if (env.NODE_ENV !== 'test') app.use(morgan('dev'));
 
   app.get('/health', (_req, res) => res.json({ status: 'ok' }));
