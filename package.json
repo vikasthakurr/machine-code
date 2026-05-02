@@ -1,9 +1,19 @@
 {
-  "name": "platform",
-  "version": "1.0.0",
-  "private": true,
+  "name": "dev-practice",
+  "version": "0.1.0",
+  "description": "A full-stack machine coding practice platform with real-time code evaluation, sandboxed execution, and Google OAuth.",
+  "private": false,
+  "license": "MIT",
   "scripts": {
     "dev": "npm run dev --prefix apps/api",
     "start": "npm start --prefix apps/api"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/<your-username>/dev-practice.git"
+  },
+  "bugs": {
+    "url": "https://github.com/<your-username>/dev-practice/issues"
+  },
+  "homepage": "https://github.com/<your-username>/dev-practice#readme"
 }

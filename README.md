@@ -1,6 +1,26 @@
-# DevPractice Platform
+# DevPractice
 
-A full-stack machine coding practice platform — think LeetCode, but focused on real-world full-stack problem solving. Users can register, browse problems, submit code, and get evaluated results in a sandboxed environment.
+> A full-stack machine coding practice platform with real-time code evaluation, sandboxed execution, and Google OAuth.
+
+DevPractice is an open-source platform for developers to sharpen their full-stack skills through hands-on machine coding challenges. Unlike algorithm-only platforms, it focuses on real-world problem solving — building features, designing APIs, and writing production-quality code.
+
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Node](https://img.shields.io/badge/node-%3E%3D18-green)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+
+---
+
+## Table of Contents
+
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [API Reference](#api-reference)
+- [Authentication](#authentication)
+- [Response Format](#response-format)
+- [Development Status](#development-status)
+- [Contributing](#contributing)
+- [License](#license)
 
 ---
 
@@ -20,25 +40,25 @@ A full-stack machine coding practice platform — think LeetCode, but focused on
 ## Project Structure
 
 ```
-platform/
+dev-practice/
 ├── apps/
-│   ├── api/                  # Node.js main backend
+│   ├── api/                        # Node.js main backend
 │   │   ├── src/
-│   │   │   ├── config/       # DB, Redis, Passport, env
-│   │   │   ├── middlewares/  # Auth, error handling
+│   │   │   ├── config/             # DB, Redis, Passport, env
+│   │   │   ├── middlewares/        # Auth, error handling
 │   │   │   ├── modules/
-│   │   │   │   ├── auth/         # Register, login, Google OAuth, profile
-│   │   │   │   ├── problems/     # Problem CRUD
-│   │   │   │   ├── submissions/  # Code submission + queue
-│   │   │   │   ├── execution/    # Execution results
-│   │   │   │   └── notifications/
-│   │   │   ├── utils/        # Logger, response helpers
+│   │   │   │   ├── auth/           # Register, login, Google OAuth, profile
+│   │   │   │   ├── problems/       # Problem CRUD
+│   │   │   │   ├── submissions/    # Code submission + BullMQ queue
+│   │   │   │   ├── execution/      # Execution results
+│   │   │   │   └── notifications/  # User notifications
+│   │   │   ├── utils/              # Logger, response helpers
 │   │   │   ├── app.js
 │   │   │   └── server.js
 │   │   ├── .env.example
 │   │   └── package.json
 │   │
-│   └── evaluation/           # FastAPI evaluation service
+│   └── evaluation/                 # FastAPI evaluation service (Python)
 │       └── app/
 │           ├── main.py
 │           ├── routes.py
@@ -46,8 +66,11 @@ platform/
 │           └── evaluator.py
 │
 ├── infra/
-│   ├── docker/runners/       # Base Dockerfiles per language
-│   └── env/                  # Environment configs
+│   ├── docker/runners/             # Base Dockerfiles per language
+│   └── env/                        # Environment configs
+├── .github/                        # Issue templates, PR template
+├── CONTRIBUTING.md
+├── LICENSE
 ├── docker-compose.yml
 └── package.json
 ```
@@ -59,15 +82,15 @@ platform/
 ### Prerequisites
 
 - Node.js >= 18
-- MongoDB (local or Atlas)
-- Redis (local or cloud)
-- Python >= 3.10 (for evaluation service)
+- MongoDB (local or [Atlas](https://www.mongodb.com/atlas))
+- Redis (local or [Upstash](https://upstash.com))
+- Python >= 3.10 _(for evaluation service)_
 
-### 1. Clone the repo
+### 1. Fork and clone
 
 ```bash
-git clone <repo-url>
-cd platform
+git clone https://github.com/<your-username>/dev-practice.git
+cd dev-practice
 ```
 
 ### 2. Set up environment variables
@@ -76,7 +99,7 @@ cd platform
 cp apps/api/.env.example apps/api/.env
 ```
 
-Fill in the values in `apps/api/.env`:
+Edit `apps/api/.env` with your values:
 
 ```env
 NODE_ENV=development
@@ -91,24 +114,27 @@ CLIENT_URL=http://localhost:5173
 EVALUATION_SERVICE_URL=http://localhost:8000
 ```
 
-### 3. Install dependencies
+### 3. Install and run
 
 ```bash
 cd apps/api
 npm install
+npm run dev
 ```
 
-### 4. Start the API
+Or from the root:
 
 ```bash
-# from platform/
-npm run dev
-
-# or from apps/api/
 npm run dev
 ```
 
 Server runs at `http://localhost:3000`
+
+Verify with:
+```bash
+curl http://localhost:3000/health
+# {"status":"ok"}
+```
 
 ---
 
@@ -130,8 +156,7 @@ GET /health
 | GET | `/api/v1/auth/google` | No | Start Google OAuth flow |
 | GET | `/api/v1/auth/google/callback` | No | Google OAuth callback |
 
-#### Register
-
+**Register**
 ```json
 POST /api/v1/auth/register
 {
@@ -147,24 +172,12 @@ POST /api/v1/auth/register
 }
 ```
 
-#### Login
-
+**Login**
 ```json
 POST /api/v1/auth/login
 {
   "email": "user@example.com",
   "password": "Secret@123"
-}
-```
-
-Response:
-```json
-{
-  "success": true,
-  "data": {
-    "token": "<jwt>",
-    "user": { ... }
-  }
 }
 ```
 
@@ -184,8 +197,7 @@ Response:
 | GET | `/api/v1/submissions/me` | Yes | My submissions |
 | GET | `/api/v1/submissions/:id` | Yes | Get submission by ID |
 
-#### Submit Code
-
+**Submit Code**
 ```json
 POST /api/v1/submissions
 Authorization: Bearer <token>
@@ -213,19 +225,24 @@ Authorization: Bearer <token>
 
 ## Authentication
 
-All protected routes require a Bearer token in the `Authorization` header:
+Protected routes require a Bearer token:
 
 ```
 Authorization: Bearer <your-jwt-token>
 ```
 
-### Google OAuth Flow
+**Google OAuth Flow**
 
 ```
-1. GET  /api/v1/auth/google              → redirects to Google
-2. User approves on Google
-3. GET  /api/v1/auth/google/callback     → issues JWT
+1. GET /api/v1/auth/google           → redirects to Google consent screen
+2. User approves
+3. GET /api/v1/auth/google/callback  → issues JWT
 4. Redirects to CLIENT_URL/auth/callback?token=<jwt>
+```
+
+To enable Google OAuth, create credentials at [Google Cloud Console](https://console.cloud.google.com) and set the redirect URI to:
+```
+http://localhost:3000/api/v1/auth/google/callback
 ```
 
 ---
@@ -235,10 +252,8 @@ Authorization: Bearer <your-jwt-token>
 All responses follow a consistent shape:
 
 ```json
-// success
 { "success": true, "data": { ... } }
 
-// error
 { "success": false, "message": "..." }
 ```
 
@@ -248,16 +263,19 @@ All responses follow a consistent shape:
 
 | Module | Status |
 |---|---|
-| Auth (local + Google OAuth) | ✅ Complete |
-| Problems | ✅ Complete |
-| Submissions + Queue | ✅ Complete |
+| Auth — local (register/login) | ✅ Complete |
+| Auth — Google OAuth | ✅ Complete |
+| User profile | ✅ Complete |
+| Problems CRUD | ✅ Complete |
+| Submissions + BullMQ queue | ✅ Complete |
 | Notifications | ✅ Complete |
-| Execution (read) | ✅ Complete |
+| Execution results (read) | ✅ Complete |
 | Evaluation Service (FastAPI) | 🚧 In Progress |
-| BullMQ Worker | 🚧 In Progress |
-| Docker Code Runners | 🚧 In Progress |
-| Input Validation (Zod) | 📋 Planned |
-| Profile Picture Upload | 📋 Planned |
+| BullMQ worker | 🚧 In Progress |
+| Docker code runners | 🚧 In Progress |
+| Input validation (Zod) | 📋 Planned |
+| Profile picture upload | 📋 Planned |
+| Admin role enforcement | 📋 Planned |
 | Frontend | 📋 Planned |
 
 ---
@@ -269,14 +287,24 @@ All responses follow a consistent shape:
 | `MONGO_URI` | MongoDB connection string | Yes |
 | `REDIS_URL` | Redis connection URL | Yes |
 | `JWT_SECRET` | Secret for signing JWTs | Yes |
-| `JWT_EXPIRES_IN` | Token expiry (e.g. `7d`) | Yes |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID | For OAuth |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | For OAuth |
-| `CLIENT_URL` | Frontend URL for OAuth redirect | For OAuth |
-| `EVALUATION_SERVICE_URL` | FastAPI service URL | For execution |
+| `JWT_EXPIRES_IN` | Token expiry e.g. `7d` | Yes |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID | OAuth only |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | OAuth only |
+| `CLIENT_URL` | Frontend URL for OAuth redirect | OAuth only |
+| `EVALUATION_SERVICE_URL` | FastAPI service base URL | Execution only |
+
+---
+
+## Contributing
+
+Contributions are welcome. Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a PR.
+
+- Look for issues tagged `good first issue` to get started
+- Follow the branch naming and commit style in the contributing guide
+- One feature or fix per PR
 
 ---
 
 ## License
 
-MIT
+[MIT](./LICENSE) — free to use, modify, and distribute.
