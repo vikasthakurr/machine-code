@@ -1,6 +1,6 @@
 # DevPractice
 
-> A full-stack machine coding practice platform with real-time code evaluation, sandboxed execution, and Google OAuth.
+> A full-stack machine coding practice platform with real-time code evaluation, sandboxed execution, and Google OAuth — built with microservices architecture.
 
 DevPractice is an open-source platform for developers to sharpen their full-stack skills through hands-on machine coding challenges. Unlike algorithm-only platforms, it focuses on real-world problem solving — building features, designing APIs, and writing production-quality code.
 
@@ -10,70 +10,106 @@ DevPractice is an open-source platform for developers to sharpen their full-stac
 
 ---
 
-## Table of Contents
+## Architecture
 
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [API Reference](#api-reference)
-- [Authentication](#authentication)
-- [Response Format](#response-format)
-- [Development Status](#development-status)
-- [Contributing](#contributing)
-- [License](#license)
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    API Gateway (port 3000)                    │
+│              Routing, CORS, Rate Limiting                     │
+└────┬──────────┬──────────────┬──────────────┬───────────────┘
+     │          │              │              │
+     ▼          ▼              ▼              ▼
+┌────────┐ ┌──────────┐ ┌────────────┐ ┌──────────────────┐
+│  Auth  │ │ Problems │ │Submissions │ │  Notifications   │
+│ :3001  │ │  :3002   │ │   :3003    │ │     :3005        │
+└────────┘ └──────────┘ └─────┬──────┘ └──────────────────┘
+                               │ BullMQ          ┌──────────┐
+                               │                 │Execution │
+                               ▼                 │  :3004   │
+                        ┌─────────────┐          └──────────┘
+                        │   Worker    │
+                        └──────┬──────┘
+                               │ HTTP
+                        ┌──────▼──────┐
+                        │ Evaluation  │
+                        │   :8000     │
+                        └──────┬──────┘
+                               │
+                        ┌──────▼──────┐
+                        │Docker Runner│
+                        │ (sandboxed) │
+                        └─────────────┘
+```
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Main API | Node.js + Express (ESM) |
-| Evaluation Service | FastAPI (Python) |
-| Database | MongoDB (Mongoose) |
-| Queue | Redis + BullMQ |
-| Auth | JWT + Google OAuth 2.0 |
-| Code Execution | Docker sandboxes |
+| Layer              | Technology                                |
+| ------------------ | ----------------------------------------- |
+| API Gateway        | Node.js + Express + http-proxy-middleware |
+| Microservices      | Node.js + Express (ESM)                   |
+| Evaluation Service | FastAPI (Python)                          |
+| Database           | MongoDB (Mongoose)                        |
+| Queue              | Redis + BullMQ                            |
+| Auth               | JWT + Google OAuth 2.0                    |
+| Code Execution     | Docker sandboxes (isolated containers)    |
+| Orchestration      | Docker Compose                            |
 
 ---
 
 ## Project Structure
 
 ```
-dev-practice/
-├── apps/
-│   ├── api/                        # Node.js main backend
-│   │   ├── src/
-│   │   │   ├── config/             # DB, Redis, Passport, env
-│   │   │   ├── middlewares/        # Auth, error handling
-│   │   │   ├── modules/
-│   │   │   │   ├── auth/           # Register, login, Google OAuth, profile
-│   │   │   │   ├── problems/       # Problem CRUD
-│   │   │   │   ├── submissions/    # Code submission + BullMQ queue
-│   │   │   │   ├── execution/      # Execution results
-│   │   │   │   └── notifications/  # User notifications
-│   │   │   ├── utils/              # Logger, response helpers
-│   │   │   ├── app.js
-│   │   │   └── server.js
-│   │   ├── .env.example
-│   │   └── package.json
-│   │
-│   └── evaluation/                 # FastAPI evaluation service (Python)
-│       └── app/
-│           ├── main.py
-│           ├── routes.py
-│           ├── schemas.py
-│           └── evaluator.py
-│
+devpractice/
+├── services/
+│   ├── gateway/           # API Gateway — routes to downstream services
+│   ├── auth/              # Auth service (register, login, OAuth, profile)
+│   ├── problems/          # Problems CRUD service
+│   ├── submissions/       # Submissions + BullMQ queue producer
+│   ├── execution/         # Execution results service
+│   ├── notifications/     # Notifications service
+│   ├── worker/            # BullMQ consumer — bridges queue → evaluation
+│   └── evaluation/        # FastAPI — runs code in Docker sandboxes
+├── packages/
+│   └── shared/            # Shared utilities (auth middleware, response, logger)
 ├── infra/
-│   ├── docker/runners/             # Base Dockerfiles per language
-│   └── env/                        # Environment configs
-├── .github/                        # Issue templates, PR template
-├── CONTRIBUTING.md
-├── LICENSE
-├── docker-compose.yml
+│   └── docker/runners/    # Language-specific Docker images (Node, Python, Java)
+├── docker-compose.yml     # Full orchestration
+└── package.json           # Root scripts
+```
+
+Each Node.js service follows:
+
+```
+service/
+├── src/
+│   ├── config/            # env.js, db.js
+│   ├── controllers/       # Request handlers
+│   ├── models/            # Mongoose schemas
+│   ├── routes/            # Express routes
+│   ├── services/          # Business logic
+│   ├── app.js             # Express app setup
+│   └── server.js          # Bootstrap + listen
+├── .env.example
+├── Dockerfile
 └── package.json
 ```
+
+---
+
+## Services & Ports
+
+| Service       | Port | Description                                |
+| ------------- | ---- | ------------------------------------------ |
+| Gateway       | 3000 | API Gateway — single entry point           |
+| Auth          | 3001 | Registration, login, Google OAuth, profile |
+| Problems      | 3002 | Problem CRUD                               |
+| Submissions   | 3003 | Code submission + queue producer           |
+| Execution     | 3004 | Execution result retrieval                 |
+| Notifications | 3005 | User notifications                         |
+| Evaluation    | 8000 | FastAPI — sandboxed code evaluation        |
+| Worker        | —    | BullMQ consumer (no HTTP port)             |
 
 ---
 
@@ -82,216 +118,145 @@ dev-practice/
 ### Prerequisites
 
 - Node.js >= 18
-- MongoDB (local or [Atlas](https://www.mongodb.com/atlas))
-- Redis (local or [Upstash](https://upstash.com))
-- Python >= 3.10 _(for evaluation service)_
+- Docker & Docker Compose
+- MongoDB (or use Docker)
+- Redis (or use Docker)
+- Python >= 3.11 _(for evaluation service, or use Docker)_
 
-### 1. Fork and clone
+### Quick Start with Docker Compose
 
 ```bash
+# Clone the repo
 git clone https://github.com/<your-username>/dev-practice.git
 cd dev-practice
+
+# Build runner images
+npm run docker:build-runners
+
+# Start everything
+docker compose up --build
 ```
 
-### 2. Set up environment variables
+All services start automatically. The gateway is accessible at `http://localhost:3000`.
+
+### Local Development (without Docker)
 
 ```bash
-cp apps/api/.env.example apps/api/.env
+# Install all service dependencies
+npm run install:all
+
+# Copy env files
+cp services/auth/.env.example services/auth/.env
+cp services/problems/.env.example services/problems/.env
+cp services/submissions/.env.example services/submissions/.env
+cp services/execution/.env.example services/execution/.env
+cp services/notifications/.env.example services/notifications/.env
+cp services/worker/.env.example services/worker/.env
+cp services/gateway/.env.example services/gateway/.env
+
+# Start services individually (in separate terminals)
+npm run dev:auth
+npm run dev:problems
+npm run dev:submissions
+npm run dev:execution
+npm run dev:notifications
+npm run dev:worker
+npm run dev:gateway
 ```
 
-Edit `apps/api/.env` with your values:
+### Verify
 
-```env
-NODE_ENV=development
-PORT=3000
-MONGO_URI=your-mongodb-uri
-REDIS_URL=redis://localhost:6379
-JWT_SECRET=your-secret-key
-JWT_EXPIRES_IN=7d
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-CLIENT_URL=http://localhost:5173
-EVALUATION_SERVICE_URL=http://localhost:8000
-```
-
-### 3. Install and run
-
-```bash
-cd apps/api
-npm install
-npm run dev
-```
-
-Or from the root:
-
-```bash
-npm run dev
-```
-
-Server runs at `http://localhost:3000`
-
-Verify with:
 ```bash
 curl http://localhost:3000/health
-# {"status":"ok"}
+# {"status":"ok","service":"gateway"}
 ```
 
 ---
 
 ## API Reference
 
-### Health
-
-```
-GET /health
-```
+All requests go through the gateway at `http://localhost:3000`.
 
 ### Auth
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/api/v1/auth/register` | No | Register with email/password |
-| POST | `/api/v1/auth/login` | No | Login, returns JWT |
-| PATCH | `/api/v1/auth/profile` | Yes | Update profile |
-| GET | `/api/v1/auth/google` | No | Start Google OAuth flow |
-| GET | `/api/v1/auth/google/callback` | No | Google OAuth callback |
-
-**Register**
-```json
-POST /api/v1/auth/register
-{
-  "email": "user@example.com",
-  "username": "johndoe",
-  "password": "Secret@123",
-  "collegeName": "MIT",
-  "passingYear": 2025,
-  "gender": "male",
-  "userType": "student",
-  "bio": "Full-stack dev",
-  "github": "https://github.com/johndoe"
-}
-```
-
-**Login**
-```json
-POST /api/v1/auth/login
-{
-  "email": "user@example.com",
-  "password": "Secret@123"
-}
-```
+| Method | Endpoint                       | Auth | Description                  |
+| ------ | ------------------------------ | ---- | ---------------------------- |
+| POST   | `/api/v1/auth/register`        | No   | Register with email/password |
+| POST   | `/api/v1/auth/login`           | No   | Login, returns JWT           |
+| PATCH  | `/api/v1/auth/profile`         | Yes  | Update profile               |
+| GET    | `/api/v1/auth/google`          | No   | Start Google OAuth flow      |
+| GET    | `/api/v1/auth/google/callback` | No   | Google OAuth callback        |
 
 ### Problems
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/api/v1/problems` | No | List all published problems |
-| GET | `/api/v1/problems/:slug` | No | Get problem by slug |
-| POST | `/api/v1/problems` | Yes | Create problem (admin) |
+| Method | Endpoint                 | Auth | Description                 |
+| ------ | ------------------------ | ---- | --------------------------- |
+| GET    | `/api/v1/problems`       | No   | List all published problems |
+| GET    | `/api/v1/problems/:slug` | No   | Get problem by slug         |
+| POST   | `/api/v1/problems`       | Yes  | Create problem (admin)      |
 
 ### Submissions
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/api/v1/submissions` | Yes | Submit code |
-| GET | `/api/v1/submissions/me` | Yes | My submissions |
-| GET | `/api/v1/submissions/:id` | Yes | Get submission by ID |
-
-**Submit Code**
-```json
-POST /api/v1/submissions
-Authorization: Bearer <token>
-{
-  "problemId": "64f...",
-  "language": "javascript",
-  "code": "function solve(input) { ... }"
-}
-```
+| Method | Endpoint                  | Auth | Description          |
+| ------ | ------------------------- | ---- | -------------------- |
+| POST   | `/api/v1/submissions`     | Yes  | Submit code          |
+| GET    | `/api/v1/submissions/me`  | Yes  | My submissions       |
+| GET    | `/api/v1/submissions/:id` | Yes  | Get submission by ID |
 
 ### Execution
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/api/v1/execution/:submissionId` | Yes | Get execution result |
+| Method | Endpoint                          | Auth | Description          |
+| ------ | --------------------------------- | ---- | -------------------- |
+| GET    | `/api/v1/execution/:submissionId` | Yes  | Get execution result |
 
 ### Notifications
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/api/v1/notifications` | Yes | Get my notifications |
-| PATCH | `/api/v1/notifications/:id/read` | Yes | Mark as read |
+| Method | Endpoint                         | Auth | Description          |
+| ------ | -------------------------------- | ---- | -------------------- |
+| GET    | `/api/v1/notifications`          | Yes  | Get my notifications |
+| PATCH  | `/api/v1/notifications/:id/read` | Yes  | Mark as read         |
 
 ---
 
-## Authentication
+## Inter-Service Communication
 
-Protected routes require a Bearer token:
-
-```
-Authorization: Bearer <your-jwt-token>
-```
-
-**Google OAuth Flow**
-
-```
-1. GET /api/v1/auth/google           → redirects to Google consent screen
-2. User approves
-3. GET /api/v1/auth/google/callback  → issues JWT
-4. Redirects to CLIENT_URL/auth/callback?token=<jwt>
-```
-
-To enable Google OAuth, create credentials at [Google Cloud Console](https://console.cloud.google.com) and set the redirect URI to:
-```
-http://localhost:3000/api/v1/auth/google/callback
-```
-
----
-
-## Response Format
-
-All responses follow a consistent shape:
-
-```json
-{ "success": true, "data": { ... } }
-
-{ "success": false, "message": "..." }
-```
-
----
-
-## Development Status
-
-| Module | Status |
-|---|---|
-| Auth — local (register/login) | ✅ Complete |
-| Auth — Google OAuth | ✅ Complete |
-| User profile | ✅ Complete |
-| Problems CRUD | ✅ Complete |
-| Submissions + BullMQ queue | ✅ Complete |
-| Notifications | ✅ Complete |
-| Execution results (read) | ✅ Complete |
-| Evaluation Service (FastAPI) | 🚧 In Progress |
-| BullMQ worker | 🚧 In Progress |
-| Docker code runners | 🚧 In Progress |
-| Input validation (Zod) | 📋 Planned |
-| Profile picture upload | 📋 Planned |
-| Admin role enforcement | 📋 Planned |
-| Frontend | 📋 Planned |
+| From        | To           | Method       | Purpose                                        |
+| ----------- | ------------ | ------------ | ---------------------------------------------- |
+| Gateway     | All services | HTTP Proxy   | Route external requests                        |
+| Submissions | Redis        | BullMQ Queue | Produce evaluation jobs                        |
+| Worker      | Redis        | BullMQ Queue | Consume evaluation jobs                        |
+| Worker      | Evaluation   | HTTP POST    | Send code for execution                        |
+| Worker      | MongoDB      | Direct       | Update submission status, create notifications |
 
 ---
 
 ## Environment Variables
 
-| Variable | Description | Required |
-|---|---|---|
-| `MONGO_URI` | MongoDB connection string | Yes |
-| `REDIS_URL` | Redis connection URL | Yes |
-| `JWT_SECRET` | Secret for signing JWTs | Yes |
-| `JWT_EXPIRES_IN` | Token expiry e.g. `7d` | Yes |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID | OAuth only |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | OAuth only |
-| `CLIENT_URL` | Frontend URL for OAuth redirect | OAuth only |
-| `EVALUATION_SERVICE_URL` | FastAPI service base URL | Execution only |
+Each service has its own `.env.example`. Common variables:
+
+| Variable                 | Used By             | Description                                            |
+| ------------------------ | ------------------- | ------------------------------------------------------ |
+| `JWT_SECRET`             | All services        | Must be **identical** across services for auth to work |
+| `MONGO_URI`              | Each service        | Can be same DB or separate per service                 |
+| `REDIS_URL`              | Submissions, Worker | Redis connection for BullMQ                            |
+| `EVALUATION_SERVICE_URL` | Worker              | FastAPI service URL                                    |
+| `GOOGLE_CLIENT_ID`       | Auth                | Google OAuth                                           |
+| `GOOGLE_CLIENT_SECRET`   | Auth                | Google OAuth                                           |
+| `CLIENT_URL`             | Auth                | Frontend URL for OAuth redirect                        |
+
+---
+
+## Shared Package
+
+`packages/shared` contains utilities shared across all Node.js services:
+
+- **Response helpers** — `ok()`, `created()`, `badRequest()`, `unauthorized()`, `notFound()`, `serverError()`
+- **Auth middleware** — `authenticate(jwtSecret)` — JWT verification
+- **Error handler** — Express error middleware
+- **Logger** — Simple console logger
+- **Validate middleware** — Zod schema validation
+
+Services reference it via `"@devpractice/shared": "file:../../packages/shared"` in their package.json.
 
 ---
 
@@ -299,12 +264,8 @@ All responses follow a consistent shape:
 
 Contributions are welcome. Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a PR.
 
-- Look for issues tagged `good first issue` to get started
-- Follow the branch naming and commit style in the contributing guide
-- One feature or fix per PR
-
 ---
 
 ## License
 
-[MIT](./LICENSE) — free to use, modify, and distribute.
+[MIT](./LICENSE)

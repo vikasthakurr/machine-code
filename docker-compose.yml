@@ -1,0 +1,168 @@
+version: "3.8"
+
+services:
+  # ─── Infrastructure ─────────────────────────────────────────
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── API Gateway ────────────────────────────────────────────
+  gateway:
+    build:
+      context: .
+      dockerfile: services/gateway/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - AUTH_SERVICE_URL=http://auth:3001
+      - PROBLEMS_SERVICE_URL=http://problems:3002
+      - SUBMISSIONS_SERVICE_URL=http://submissions:3003
+      - EXECUTION_SERVICE_URL=http://execution:3004
+      - NOTIFICATIONS_SERVICE_URL=http://notifications:3005
+    depends_on:
+      - auth
+      - problems
+      - submissions
+      - execution
+      - notifications
+
+  # ─── Auth Service ───────────────────────────────────────────
+  auth:
+    build:
+      context: .
+      dockerfile: services/auth/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - MONGO_URI=mongodb://mongo:27017/devpractice_auth
+      - JWT_SECRET=${JWT_SECRET:-change-me}
+      - JWT_EXPIRES_IN=7d
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
+      - CLIENT_URL=${CLIENT_URL:-http://localhost:5173}
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  # ─── Problems Service ───────────────────────────────────────
+  problems:
+    build:
+      context: .
+      dockerfile: services/problems/Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+      - PORT=3002
+      - MONGO_URI=mongodb://mongo:27017/devpractice_problems
+      - JWT_SECRET=${JWT_SECRET:-change-me}
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  # ─── Submissions Service ────────────────────────────────────
+  submissions:
+    build:
+      context: .
+      dockerfile: services/submissions/Dockerfile
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=development
+      - PORT=3003
+      - MONGO_URI=mongodb://mongo:27017/devpractice_submissions
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET:-change-me}
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ─── Execution Service ──────────────────────────────────────
+  execution:
+    build:
+      context: .
+      dockerfile: services/execution/Dockerfile
+    ports:
+      - "3004:3004"
+    environment:
+      - NODE_ENV=development
+      - PORT=3004
+      - MONGO_URI=mongodb://mongo:27017/devpractice_execution
+      - JWT_SECRET=${JWT_SECRET:-change-me}
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  # ─── Notifications Service ──────────────────────────────────
+  notifications:
+    build:
+      context: .
+      dockerfile: services/notifications/Dockerfile
+    ports:
+      - "3005:3005"
+    environment:
+      - NODE_ENV=development
+      - PORT=3005
+      - MONGO_URI=mongodb://mongo:27017/devpractice_notifications
+      - JWT_SECRET=${JWT_SECRET:-change-me}
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  # ─── Worker (BullMQ Consumer) ───────────────────────────────
+  worker:
+    build:
+      context: .
+      dockerfile: services/worker/Dockerfile
+    environment:
+      - NODE_ENV=development
+      - MONGO_URI=mongodb://mongo:27017/devpractice
+      - REDIS_URL=redis://redis:6379
+      - EVALUATION_SERVICE_URL=http://evaluation:8000
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      evaluation:
+        condition: service_started
+
+  # ─── Evaluation Service (FastAPI) ───────────────────────────
+  evaluation:
+    build:
+      context: ./services/evaluation
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+
+volumes:
+  mongo_data:
