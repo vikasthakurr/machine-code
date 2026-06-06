@@ -1,19 +1,24 @@
 {
-  "name": "dev-practice",
-  "version": "0.1.0",
-  "description": "A full-stack machine coding practice platform with real-time code evaluation, sandboxed execution, and Google OAuth.",
-  "private": false,
+  "name": "devpractice",
+  "version": "1.0.0",
+  "description": "A full-stack machine coding practice platform — microservices architecture",
+  "private": true,
   "license": "MIT",
   "scripts": {
-    "dev": "npm run dev --prefix apps/api",
-    "start": "npm start --prefix apps/api"
+    "dev:gateway": "npm run dev --prefix services/gateway",
+    "dev:auth": "npm run dev --prefix services/auth",
+    "dev:problems": "npm run dev --prefix services/problems",
+    "dev:submissions": "npm run dev --prefix services/submissions",
+    "dev:execution": "npm run dev --prefix services/execution",
+    "dev:notifications": "npm run dev --prefix services/notifications",
+    "dev:worker": "npm run dev --prefix services/worker",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "docker:build-runners": "docker build -t devpractice-runner-node -f infra/docker/runners/node.Dockerfile . && docker build -t devpractice-runner-python -f infra/docker/runners/python.Dockerfile . && docker build -t devpractice-runner-java -f infra/docker/runners/java.Dockerfile .",
+    "install:all": "npm install --prefix services/gateway && npm install --prefix services/auth && npm install --prefix services/problems && npm install --prefix services/submissions && npm install --prefix services/execution && npm install --prefix services/notifications && npm install --prefix services/worker"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/<your-username>/dev-practice.git"
-  },
-  "bugs": {
-    "url": "https://github.com/<your-username>/dev-practice/issues"
-  },
-  "homepage": "https://github.com/<your-username>/dev-practice#readme"
+  }
 }

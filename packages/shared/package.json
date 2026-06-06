@@ -1,0 +1,17 @@
+{
+  "name": "@devpractice/shared",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./response": "./src/response.js",
+    "./logger": "./src/logger.js",
+    "./auth": "./src/auth.middleware.js",
+    "./error": "./src/error.middleware.js",
+    "./validate": "./src/validate.middleware.js"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2"
+  }
+}
