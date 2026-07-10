@@ -4,6 +4,7 @@ export async function getAll({
   page = 1,
   limit = 20,
   difficulty,
+  category,
   tags,
   search,
   sortBy = "createdAt",
@@ -11,12 +12,9 @@ export async function getAll({
 } = {}) {
   const filter = { isPublished: true };
 
-  // Filter by difficulty
-  if (difficulty) {
-    filter.difficulty = difficulty;
-  }
+  if (difficulty) filter.difficulty = difficulty;
+  if (category) filter.category = category;
 
-  // Filter by tags (comma-separated or array)
   if (tags) {
     const tagList = Array.isArray(tags)
       ? tags
@@ -24,7 +22,6 @@ export async function getAll({
     filter.tags = { $in: tagList };
   }
 
-  // Search by title or description
   if (search) {
     filter.$or = [
       { title: { $regex: search, $options: "i" } },
@@ -37,7 +34,7 @@ export async function getAll({
 
   const [problems, total] = await Promise.all([
     Problem.find(filter)
-      .select("-testCases")
+      .select("-starterCode")
       .sort({ [sortBy]: sortOrder })
       .skip(skip)
       .limit(Number(limit)),

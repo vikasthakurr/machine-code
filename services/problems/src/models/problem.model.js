@@ -10,31 +10,26 @@ const problemSchema = new Schema(
       enum: ["easy", "medium", "hard"],
       required: true,
     },
-    type: {
+    category: {
       type: String,
-      enum: ["dsa", "machine-coding", "hld", "lld"],
-      default: "dsa",
+      enum: ["component", "feature", "mini-app", "layout", "interaction"],
+      default: "component",
     },
     tags: [String],
-
-    // For DSA / machine-coding problems (auto-evaluated)
-    testCases: [{ input: String, expectedOutput: String }],
-
-    // For HLD / LLD problems (manually reviewed)
-    rubric: [
-      {
-        criterion: { type: String }, // e.g. "Scalability", "Database Choice"
-        maxScore: { type: Number }, // e.g. 10
-        description: { type: String }, // what to look for
-      },
-    ],
-    hints: [String], // guided hints for the candidate
-    sampleDiagram: { type: Schema.Types.Mixed, default: null }, // example excalidraw JSON
-    requirements: [String], // specific things the design must address
-
+    timeLimit: { type: Number, default: 45 },
+    requirements: [String],
+    starterCode: {
+      html: { type: String, default: "" },
+      css: { type: String, default: "" },
+      js: { type: String, default: "" },
+    },
+    hints: [String],
+    referenceImage: { type: String, default: null },
     isPublished: { type: Boolean, default: false },
   },
   { timestamps: true },
 );
+
+problemSchema.index({ title: "text", description: "text" });
 
 export const Problem = model("Problem", problemSchema);

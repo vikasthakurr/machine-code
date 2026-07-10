@@ -2,11 +2,13 @@ import { badRequest, created, notFound, ok } from "@devpractice/shared";
 import * as problemsService from "../services/problems.service.js";
 
 export async function getAll(req, res) {
-  const { page, limit, difficulty, tags, search, sortBy, order } = req.query;
+  const { page, limit, difficulty, category, tags, search, sortBy, order } =
+    req.query;
   const result = await problemsService.getAll({
     page,
     limit,
     difficulty,
+    category,
     tags,
     search,
     sortBy,

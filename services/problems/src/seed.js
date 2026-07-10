@@ -3,653 +3,364 @@ import { env } from "./config/env.js";
 import { Problem } from "./models/problem.model.js";
 
 const problems = [
-  // ─── DSA Problems ────────────────────────────────────────────────────
   {
-    title: "Two Sum",
-    slug: "two-sum",
-    type: "dsa",
-    description: `Given an array of integers \`nums\` and an integer \`target\`, return the indices of the two numbers that add up to \`target\`.
-
-You may assume that each input has exactly one solution, and you may not use the same element twice.
-
-**Input Format:**
-- First line: space-separated integers (the array)
-- Second line: the target integer
-
-**Output Format:**
-- Two space-separated indices (0-indexed)
-
-**Example:**
-\`\`\`
-Input:
-2 7 11 15
-9
-
-Output:
-0 1
-\`\`\`
-
-**Constraints:**
-- 2 <= nums.length <= 10^4
-- -10^9 <= nums[i] <= 10^9`,
+    title: "Star Rating Component",
+    slug: "star-rating-component",
+    category: "component",
+    description: "Build an interactive star rating component that allows users to select a rating from 1 to 5 stars.\n\nThe component should highlight stars on hover and persist the selection on click. Display the current rating as text below the stars.",
     difficulty: "easy",
-    tags: ["arrays", "hash-map"],
-    testCases: [
-      { input: "2 7 11 15\n9", expectedOutput: "0 1" },
-      { input: "3 2 4\n6", expectedOutput: "1 2" },
-      { input: "3 3\n6", expectedOutput: "0 1" },
+    tags: ["css", "events", "dom"],
+    timeLimit: 30,
+    requirements: [
+      "Display 5 clickable stars",
+      "Stars highlight on hover (all stars up to hovered one)",
+      "Click selects the rating and persists it",
+      "Show selected rating as text (e.g. '3/5 stars')",
+      "Hovering after selection shows preview without losing saved rating",
+      "Stars should be visually distinct (filled vs empty)"
+    ],
+    starterCode: {
+      html: "<div id=\"star-rating\">\n  <!-- Build your star rating here -->\n</div>\n<p id=\"rating-text\">No rating selected</p>",
+      css: "#star-rating {\n  display: flex;\n  gap: 4px;\n  cursor: pointer;\n}\n\n.star {\n  font-size: 2rem;\n  color: #4b5563;\n  transition: color 0.15s;\n}\n\n.star.active {\n  color: #facc15;\n}",
+      js: "// Build your star rating component here\n"
+    },
+    hints: [
+      "Use mouseover and mouseout events on the container",
+      "Track both 'hovered' and 'selected' state separately",
+      "Use event delegation on the parent container"
     ],
     isPublished: true,
   },
   {
-    title: "Valid Parentheses",
-    slug: "valid-parentheses",
-    type: "dsa",
-    description: `Given a string \`s\` containing just the characters \`(\`, \`)\`, \`{\`, \`}\`, \`[\`, and \`]\`, determine if the input string is valid.
-
-**Input Format:**
-- A single string of brackets
-
-**Output Format:**
-- \`true\` or \`false\`
-
-**Constraints:**
-- 1 <= s.length <= 10^4`,
+    title: "Accordion Component",
+    slug: "accordion-component",
+    category: "component",
+    description: "Build an accordion/collapsible component that shows a list of FAQ items. Clicking on a question toggles its answer visibility.\n\nOnly one answer should be visible at a time (closing others when a new one opens).",
     difficulty: "easy",
-    tags: ["stack", "strings"],
-    testCases: [
-      { input: "()[]{}", expectedOutput: "true" },
-      { input: "(]", expectedOutput: "false" },
-      { input: "([)]", expectedOutput: "false" },
-      { input: "{[]}", expectedOutput: "true" },
-    ],
-    isPublished: true,
-  },
-  {
-    title: "Longest Substring Without Repeating Characters",
-    slug: "longest-substring-without-repeating",
-    type: "dsa",
-    description: `Given a string \`s\`, find the length of the longest substring without repeating characters.
-
-**Input Format:**
-- A single string
-
-**Output Format:**
-- An integer (the length)
-
-**Constraints:**
-- 0 <= s.length <= 5 * 10^4`,
-    difficulty: "medium",
-    tags: ["sliding-window", "hash-map", "strings"],
-    testCases: [
-      { input: "abcabcbb", expectedOutput: "3" },
-      { input: "bbbbb", expectedOutput: "1" },
-      { input: "pwwkew", expectedOutput: "3" },
-      { input: "", expectedOutput: "0" },
-    ],
-    isPublished: true,
-  },
-  {
-    title: "Merge K Sorted Lists",
-    slug: "merge-k-sorted-lists",
-    type: "dsa",
-    description: `You are given an array of \`k\` sorted linked lists. Merge all into one sorted list.
-
-**Input Format:**
-- First line: number of lists \`k\`
-- Next \`k\` lines: space-separated sorted integers
-
-**Output Format:**
-- Space-separated integers of the merged sorted list
-
-**Constraints:**
-- 0 <= k <= 10^4
-- -10^4 <= node value <= 10^4`,
-    difficulty: "hard",
-    tags: ["heap", "linked-list", "divide-and-conquer"],
-    testCases: [
-      { input: "3\n1 4 5\n1 3 4\n2 6", expectedOutput: "1 1 2 3 4 4 5 6" },
-      { input: "1\n1 2 3", expectedOutput: "1 2 3" },
-      { input: "0\n", expectedOutput: "" },
-    ],
-    isPublished: true,
-  },
-  {
-    title: "LRU Cache",
-    slug: "lru-cache",
-    type: "dsa",
-    description: `Implement LRU Cache with PUT and GET operations.
-
-**Input Format:**
-- First line: capacity
-- Following lines: \`PUT key value\` or \`GET key\`
-
-**Output Format:**
-- For each GET, print the value or -1
-
-**Constraints:**
-- 1 <= capacity <= 3000`,
-    difficulty: "medium",
-    tags: ["hash-map", "linked-list", "design"],
-    testCases: [
-      {
-        input: "2\nPUT 1 1\nPUT 2 2\nGET 1\nPUT 3 3\nGET 2\nGET 3",
-        expectedOutput: "1\n-1\n3",
-      },
-      {
-        input: "1\nPUT 1 10\nGET 1\nPUT 2 20\nGET 1\nGET 2",
-        expectedOutput: "10\n-1\n20",
-      },
-    ],
-    isPublished: true,
-  },
-  {
-    title: "Binary Tree Level Order Traversal",
-    slug: "binary-tree-level-order",
-    type: "dsa",
-    description: `Given a binary tree in level-order array form, return its BFS traversal level by level.
-
-**Input Format:**
-- Space-separated values (use "null" for missing nodes)
-
-**Output Format:**
-- Each level on a new line, values space-separated`,
-    difficulty: "medium",
-    tags: ["trees", "bfs", "queue"],
-    testCases: [
-      { input: "3 9 20 null null 15 7", expectedOutput: "3\n9 20\n15 7" },
-      { input: "1", expectedOutput: "1" },
-    ],
-    isPublished: true,
-  },
-
-  // ─── Machine Coding Problems ─────────────────────────────────────────
-  {
-    title: "Design a URL Shortener",
-    slug: "design-url-shortener",
-    type: "machine-coding",
-    description: `Implement a URL shortening service. Read commands from stdin:
-
-- \`SHORTEN <url>\` — Generate a 6-char code, print it
-- \`RESOLVE <code>\` — Print original URL or "NOT_FOUND"
-- \`COUNT <code>\` — Print resolve count
-
-Same URL = same code. RESOLVE increments count.`,
-    difficulty: "medium",
-    tags: ["system-design", "hash-map", "machine-coding"],
-    testCases: [],
-    isPublished: true,
-  },
-  {
-    title: "Design an In-Memory Key-Value Store",
-    slug: "design-key-value-store",
-    type: "machine-coding",
-    description: `Implement a KV store with TTL. Commands: SET, GET, DEL, KEYS, EXPIRE, TTL. Time advances 1 second per command.`,
-    difficulty: "medium",
-    tags: ["system-design", "hash-map", "machine-coding", "ttl"],
-    testCases: [
-      {
-        input: "SET name alice\nGET name\nDEL name\nGET name",
-        expectedOutput: "OK\nalice\n1\nNULL",
-      },
-      {
-        input: "SET a 1 2\nGET a\nGET a\nGET a",
-        expectedOutput: "OK\n1\n1\nNULL",
-      },
-    ],
-    isPublished: true,
-  },
-  {
-    title: "Design a Task Scheduler",
-    slug: "design-task-scheduler",
-    type: "machine-coding",
-    description: `Implement a task scheduler with priorities and dependencies. Commands: ADD, RUN, STATUS, LIST.`,
-    difficulty: "hard",
-    tags: ["system-design", "heap", "graph", "machine-coding"],
-    testCases: [
-      {
-        input: "ADD t1 5\nADD t2 10\nRUN\nRUN\nSTATUS t1\nSTATUS t2",
-        expectedOutput: "ADDED\nADDED\nt2\nt1\nCOMPLETED\nCOMPLETED",
-      },
-      { input: "RUN", expectedOutput: "EMPTY" },
-    ],
-    isPublished: true,
-  },
-  {
-    title: "Design a Rate Limiter",
-    slug: "design-rate-limiter",
-    type: "machine-coding",
-    description: `Implement a sliding window rate limiter. Commands: CONFIGURE, REQUEST, COUNT, RESET.`,
-    difficulty: "medium",
-    tags: ["system-design", "sliding-window", "machine-coding"],
-    testCases: [
-      {
-        input:
-          "CONFIGURE 2 10\nREQUEST u1 1\nREQUEST u1 5\nREQUEST u1 8\nREQUEST u1 12\nCOUNT u1 12",
-        expectedOutput: "OK\nALLOWED\nALLOWED\nDENIED\nALLOWED\n2",
-      },
-    ],
-    isPublished: true,
-  },
-
-  // ─── HLD (High-Level Design) Problems ────────────────────────────────
-  {
-    title: "Design Twitter",
-    slug: "design-twitter",
-    type: "hld",
-    description: `Design a simplified Twitter-like social media platform.
-
-**Requirements:**
-- Users can post tweets (text, max 280 chars)
-- Users can follow/unfollow other users
-- Users see a home timeline (tweets from people they follow, reverse chronological)
-- Tweets can be liked and retweeted
-- Users can search tweets by keyword
-
-**Design Considerations:**
-- How would you handle millions of users?
-- How would you build the home timeline efficiently?
-- What happens when a celebrity with 10M followers posts?
-- How do you handle eventual consistency?
-
-**Expected Deliverables:**
-1. Architecture diagram showing all major components
-2. Database schema design (what tables/collections, indexes)
-3. API design (key endpoints)
-4. Explanation of feed generation strategy (fan-out on write vs read)
-5. Caching strategy`,
-    difficulty: "hard",
-    tags: ["hld", "system-design", "distributed-systems", "caching", "feed"],
-    rubric: [
-      {
-        criterion: "Architecture Diagram",
-        maxScore: 10,
-        description:
-          "Clear diagram with all major components (API servers, DB, cache, queue, CDN)",
-      },
-      {
-        criterion: "Database Design",
-        maxScore: 10,
-        description:
-          "Appropriate choice of SQL vs NoSQL, proper schema, indexing strategy",
-      },
-      {
-        criterion: "API Design",
-        maxScore: 8,
-        description: "RESTful endpoints, pagination, proper auth flow",
-      },
-      {
-        criterion: "Feed Generation",
-        maxScore: 12,
-        description:
-          "Fan-out strategy, handling celebrity users, pre-computation vs on-demand",
-      },
-      {
-        criterion: "Scalability",
-        maxScore: 10,
-        description: "Horizontal scaling, sharding, partitioning strategy",
-      },
-      {
-        criterion: "Caching",
-        maxScore: 8,
-        description:
-          "Cache layers (CDN, Redis), cache invalidation, hot/cold data",
-      },
-      {
-        criterion: "Trade-offs Discussion",
-        maxScore: 7,
-        description: "Acknowledges trade-offs and explains choices",
-      },
-    ],
+    tags: ["css", "dom", "animation"],
+    timeLimit: 30,
     requirements: [
-      "Handle 500M users, 200M DAU",
-      "Average user follows 200 people",
-      "Timeline loads in < 200ms",
-      "100K tweets per second at peak",
-      "Media storage for images/videos",
+      "Render at least 4 FAQ items",
+      "Clicking a question toggles its answer",
+      "Only one answer visible at a time",
+      "Show a +/- or arrow indicator for open/closed state",
+      "Smooth expand/collapse animation",
+      "Accessible - items should be keyboard navigable"
     ],
+    starterCode: {
+      html: "<div id=\"accordion\">\n  <!-- Build your accordion here -->\n</div>",
+      css: ".accordion-item {\n  border: 1px solid #374151;\n  border-radius: 8px;\n  margin-bottom: 8px;\n  overflow: hidden;\n}\n\n.accordion-header {\n  padding: 16px;\n  cursor: pointer;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  background: #1f2937;\n}\n\n.accordion-body {\n  max-height: 0;\n  overflow: hidden;\n  transition: max-height 0.3s ease;\n  padding: 0 16px;\n}\n\n.accordion-item.active .accordion-body {\n  max-height: 200px;\n  padding: 16px;\n}",
+      js: "// Build your accordion logic here\n"
+    },
     hints: [
-      "Think about fan-out on write vs fan-out on read for timeline generation",
-      "Consider separate read and write paths",
-      "Celebrity users may need special treatment",
-      "Think about what data to cache and where",
+      "Use max-height transition for smooth animation",
+      "Toggle an 'active' class on the accordion item",
+      "Remove 'active' from all siblings before adding to clicked item"
     ],
     isPublished: true,
   },
   {
-    title: "Design a Chat Application (WhatsApp)",
-    slug: "design-chat-application",
-    type: "hld",
-    description: `Design a real-time messaging system similar to WhatsApp.
-
-**Requirements:**
-- 1-on-1 messaging with real-time delivery
-- Group chats (up to 256 members)
-- Message delivery status (sent, delivered, read)
-- Offline message storage and sync
-- Media sharing (images, videos, documents)
-- End-to-end encryption
-
-**Design Considerations:**
-- How do you maintain persistent connections?
-- How do you handle users on different servers?
-- What protocol for real-time communication?
-- How do you ensure message ordering?
-- How do you handle the user being offline?
-
-**Expected Deliverables:**
-1. Architecture diagram
-2. Protocol choice and justification (WebSocket, MQTT, etc.)
-3. Message storage and delivery flow
-4. Group messaging architecture
-5. Presence/online status system`,
-    difficulty: "hard",
-    tags: ["hld", "system-design", "real-time", "websocket", "messaging"],
-    rubric: [
-      {
-        criterion: "Architecture Diagram",
-        maxScore: 10,
-        description:
-          "Shows connection servers, message queue, storage, presence service",
-      },
-      {
-        criterion: "Real-time Protocol",
-        maxScore: 10,
-        description:
-          "WebSocket/MQTT choice justified, connection management explained",
-      },
-      {
-        criterion: "Message Delivery Flow",
-        maxScore: 12,
-        description: "Complete flow: send → store → deliver → acknowledge",
-      },
-      {
-        criterion: "Offline Handling",
-        maxScore: 8,
-        description: "Message queuing, sync on reconnect, push notifications",
-      },
-      {
-        criterion: "Group Messaging",
-        maxScore: 8,
-        description:
-          "Fan-out to group members, ordering, large group optimization",
-      },
-      {
-        criterion: "Storage Design",
-        maxScore: 7,
-        description: "Message storage, media handling, retention policies",
-      },
-      {
-        criterion: "Scalability",
-        maxScore: 10,
-        description:
-          "Connection server scaling, consistent hashing, geographic distribution",
-      },
-    ],
-    requirements: [
-      "2B total users, 500M DAU",
-      "100B messages per day",
-      "Message delivery < 100ms (same region)",
-      "Support 256-person groups",
-      "Offline sync within 30 seconds of reconnection",
-    ],
-    hints: [
-      "Each user needs a persistent connection — how do you route messages to the right server?",
-      "Consider a message queue between sender and receiver connection servers",
-      "How do you handle ordering in group messages?",
-      "Think about what metadata to store vs message content",
-    ],
-    isPublished: true,
-  },
-  {
-    title: "Design a URL Shortener (System Level)",
-    slug: "design-url-shortener-hld",
-    type: "hld",
-    description: `Design a URL shortening service like Bitly at scale.
-
-**Requirements:**
-- Shorten long URLs to short codes
-- Redirect short URLs to original with minimal latency
-- Custom short URLs (optional feature)
-- Analytics: click count, geographic data, referrer
-- URL expiration (optional TTL)
-
-**Design Considerations:**
-- How do you generate unique short codes?
-- How do you handle 1000 shortens/second?
-- How do you ensure redirects are fast (<10ms)?
-- How do you prevent abuse/spam?
-
-**Expected Deliverables:**
-1. Architecture diagram
-2. Short code generation strategy
-3. Database design
-4. Redirect flow (optimized for latency)
-5. Analytics pipeline`,
+    title: "Todo App with Filters",
+    slug: "todo-app-with-filters",
+    category: "mini-app",
+    description: "Build a fully functional todo application with add, delete, toggle complete, and filter functionality.\n\nUsers should be able to add todos, mark them complete, delete them, and filter by status (All, Active, Completed).",
     difficulty: "medium",
-    tags: ["hld", "system-design", "caching", "databases"],
-    rubric: [
-      {
-        criterion: "Architecture Diagram",
-        maxScore: 10,
-        description: "API servers, DB, cache layer, analytics pipeline",
-      },
-      {
-        criterion: "Code Generation",
-        maxScore: 10,
-        description:
-          "Base62, counter-based, hash-based approaches with collision handling",
-      },
-      {
-        criterion: "Database Design",
-        maxScore: 8,
-        description: "Schema, indexing, SQL vs NoSQL choice",
-      },
-      {
-        criterion: "Redirect Performance",
-        maxScore: 10,
-        description: "Cache-first approach, CDN, 301 vs 302 discussion",
-      },
-      {
-        criterion: "Analytics",
-        maxScore: 7,
-        description: "Async processing, time-series data, aggregation strategy",
-      },
-      {
-        criterion: "Scalability & Availability",
-        maxScore: 8,
-        description: "Replication, partitioning, failover strategy",
-      },
-    ],
+    tags: ["dom", "state-management", "events", "crud"],
+    timeLimit: 45,
     requirements: [
-      "100M URLs created per month",
-      "10:1 read-to-write ratio",
-      "Redirect latency < 10ms at p99",
-      "99.99% availability",
-      "Short URLs max 7 characters",
+      "Input field to add new todos (on Enter key)",
+      "Display todos as a list with checkboxes",
+      "Toggle completion state by clicking checkbox",
+      "Delete individual todos with a remove button",
+      "Filter buttons: All, Active, Completed",
+      "Show count of remaining active todos",
+      "Clear completed button to bulk-remove done items",
+      "Persist todos in localStorage"
     ],
+    starterCode: {
+      html: "<div id=\"app\">\n  <h1>Todos</h1>\n  <input id=\"todo-input\" type=\"text\" placeholder=\"What needs to be done?\" />\n  <div id=\"filters\"></div>\n  <ul id=\"todo-list\"></ul>\n  <div id=\"footer\"></div>\n</div>",
+      css: "#app {\n  max-width: 500px;\n  margin: 0 auto;\n  font-family: sans-serif;\n}\n\n#todo-input {\n  width: 100%;\n  padding: 12px;\n  font-size: 1rem;\n  border: 1px solid #374151;\n  border-radius: 8px;\n  background: #1f2937;\n  color: white;\n  margin-bottom: 16px;\n}\n\n.todo-item {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  padding: 12px;\n  border-bottom: 1px solid #374151;\n}\n\n.todo-item.completed span {\n  text-decoration: line-through;\n  opacity: 0.5;\n}",
+      js: "// Build your todo app here\n"
+    },
     hints: [
-      "Base62 encoding gives you 62^7 ≈ 3.5 trillion unique URLs",
-      "Pre-generate short codes vs generate on demand?",
-      "Caching is key for redirect performance",
-      "Consider separating read and write paths",
+      "Keep todos in an array, re-render the list on every change",
+      "Use event delegation for checkbox and delete button clicks",
+      "Filter is just a view concern - dont modify the source array"
     ],
     isPublished: true,
   },
   {
-    title: "Design a Notification System",
-    slug: "design-notification-system",
-    type: "hld",
-    description: `Design a notification delivery system that supports multiple channels.
-
-**Requirements:**
-- Push notifications (iOS, Android)
-- Email notifications
-- SMS notifications
-- In-app notifications
-- User notification preferences (opt-in/out per channel)
-- Rate limiting (don't spam users)
-- Priority levels (critical, high, normal, low)
-- Template system for notification content
-
-**Design Considerations:**
-- How do you handle millions of notifications per minute?
-- How do you ensure delivery across unreliable channels?
-- How do you prevent notification fatigue?
-- How do you support A/B testing notification content?
-
-**Expected Deliverables:**
-1. Architecture diagram showing the full pipeline
-2. Event ingestion and routing logic
-3. Delivery guarantees per channel
-4. Rate limiting and deduplication
-5. User preference management`,
+    title: "Autocomplete Search",
+    slug: "autocomplete-search",
+    category: "feature",
+    description: "Build an autocomplete/typeahead search input that shows suggestions as the user types.\n\nFetch suggestions from a mock data array and display matching results in a dropdown below the input.",
     difficulty: "medium",
-    tags: [
-      "hld",
-      "system-design",
-      "event-driven",
-      "queues",
-      "distributed-systems",
-    ],
-    rubric: [
-      {
-        criterion: "Architecture Diagram",
-        maxScore: 10,
-        description: "Event source → router → channel adapters → delivery",
-      },
-      {
-        criterion: "Event Pipeline",
-        maxScore: 10,
-        description: "Ingestion, deduplication, priority queuing",
-      },
-      {
-        criterion: "Multi-Channel Delivery",
-        maxScore: 8,
-        description: "Adapters for push/email/SMS, retry logic per channel",
-      },
-      {
-        criterion: "User Preferences",
-        maxScore: 7,
-        description: "Preference storage, channel selection logic, quiet hours",
-      },
-      {
-        criterion: "Rate Limiting",
-        maxScore: 8,
-        description: "Per-user, per-channel, global rate limits",
-      },
-      {
-        criterion: "Reliability",
-        maxScore: 7,
-        description: "At-least-once delivery, DLQ, monitoring/alerting",
-      },
-      {
-        criterion: "Scalability",
-        maxScore: 8,
-        description: "Horizontal scaling of workers, partitioning by user",
-      },
-    ],
+    tags: ["dom", "events", "debounce", "filtering"],
+    timeLimit: 45,
     requirements: [
-      "10M notifications per hour at peak",
-      "Push notification delivery < 5 seconds",
-      "Email within 1 minute",
-      "99.9% delivery rate for critical notifications",
-      "Support 100M users with individual preferences",
+      "Input field that filters suggestions as user types",
+      "Show dropdown with matching results (case-insensitive)",
+      "Highlight the matching text portion in suggestions",
+      "Keyboard navigation (arrow keys + Enter to select)",
+      "Click on suggestion fills the input",
+      "Close dropdown when clicking outside",
+      "Debounce input to avoid excessive filtering",
+      "Show 'No results' when nothing matches"
     ],
+    starterCode: {
+      html: "<div id=\"search-container\">\n  <input id=\"search-input\" type=\"text\" placeholder=\"Search countries...\" autocomplete=\"off\" />\n  <ul id=\"suggestions\"></ul>\n</div>",
+      css: "#search-container {\n  position: relative;\n  max-width: 400px;\n  margin: 40px auto;\n}\n\n#search-input {\n  width: 100%;\n  padding: 12px 16px;\n  font-size: 1rem;\n  border: 1px solid #374151;\n  border-radius: 8px;\n  background: #1f2937;\n  color: white;\n}\n\n#suggestions {\n  position: absolute;\n  top: 100%;\n  left: 0;\n  right: 0;\n  background: #1f2937;\n  border: 1px solid #374151;\n  border-radius: 8px;\n  margin-top: 4px;\n  max-height: 250px;\n  overflow-y: auto;\n  display: none;\n}\n\n#suggestions.active {\n  display: block;\n}\n\n#suggestions li {\n  padding: 10px 16px;\n  cursor: pointer;\n}\n\n#suggestions li:hover,\n#suggestions li.highlighted {\n  background: #374151;\n}",
+      js: "const countries = [\n  \"India\", \"United States\", \"Indonesia\", \"Brazil\", \"Pakistan\",\n  \"Nigeria\", \"Bangladesh\", \"Russia\", \"Japan\", \"Mexico\",\n  \"Germany\", \"France\", \"United Kingdom\", \"Italy\", \"South Korea\",\n  \"Canada\", \"Australia\", \"Spain\", \"Argentina\", \"Netherlands\"\n];\n\n// Build your autocomplete here\n"
+    },
     hints: [
-      "Think of it as a pipeline: Event → Validate → Route → Deliver → Track",
-      "Different channels have very different latency and reliability characteristics",
-      "Consider a priority queue — critical alerts skip the line",
-      "Idempotency keys prevent duplicate sends",
+      "Use setTimeout for debounce - clear previous timeout on each keystroke",
+      "Track highlighted index for keyboard navigation",
+      "Use document.addEventListener('click') to detect outside clicks"
     ],
     isPublished: true,
   },
   {
-    title: "Design a Payment System",
-    slug: "design-payment-system",
-    type: "hld",
-    description: `Design a payment processing system like Stripe or Razorpay.
-
-**Requirements:**
-- Process credit card payments
-- Handle refunds
-- Support multiple currencies
-- Transaction history and reconciliation
-- Webhook notifications to merchants
-- PCI DSS compliance considerations
-- Idempotent payment processing
-
-**Design Considerations:**
-- How do you handle double-charge scenarios?
-- How do you ensure exactly-once processing?
-- How do you handle payment gateway failures?
-- How do you manage settlement with banks?
-
-**Expected Deliverables:**
-1. Architecture diagram
-2. Payment flow (initiate → authorize → capture → settle)
-3. Idempotency and failure handling
-4. Database design for transactions
-5. Reconciliation process`,
-    difficulty: "hard",
-    tags: [
-      "hld",
-      "system-design",
-      "distributed-systems",
-      "transactions",
-      "fintech",
-    ],
-    rubric: [
-      {
-        criterion: "Architecture Diagram",
-        maxScore: 10,
-        description: "Payment gateway, processor, ledger, webhook service",
-      },
-      {
-        criterion: "Payment Flow",
-        maxScore: 12,
-        description: "Complete lifecycle: auth → capture → settle, 3DS flow",
-      },
-      {
-        criterion: "Idempotency",
-        maxScore: 10,
-        description: "Idempotency keys, state machine, handling retries safely",
-      },
-      {
-        criterion: "Failure Handling",
-        maxScore: 10,
-        description:
-          "Timeout handling, compensating transactions, saga pattern",
-      },
-      {
-        criterion: "Data Model",
-        maxScore: 8,
-        description:
-          "Transactions ledger, double-entry bookkeeping, audit trail",
-      },
-      {
-        criterion: "Security",
-        maxScore: 8,
-        description: "PCI compliance, tokenization, encryption at rest",
-      },
-      {
-        criterion: "Reconciliation",
-        maxScore: 7,
-        description: "Daily settlement, mismatch detection, dispute handling",
-      },
-    ],
+    title: "Modal System",
+    slug: "modal-system",
+    category: "component",
+    description: "Build a reusable modal/dialog system with open, close, and overlay click-to-close functionality.\n\nSupport multiple modal triggers on the same page with different content.",
+    difficulty: "easy",
+    tags: ["css", "dom", "accessibility"],
+    timeLimit: 30,
     requirements: [
-      "10,000 transactions per second",
-      "Zero double-charges (exactly-once semantics)",
-      "99.999% availability for payment processing",
-      "Support 50+ currencies",
-      "Full audit trail for 7 years",
+      "Button click opens the modal",
+      "Modal displays centered with an overlay/backdrop",
+      "Close button inside the modal closes it",
+      "Clicking the overlay closes the modal",
+      "Escape key closes the modal",
+      "Body scroll is locked when modal is open",
+      "Focus trap inside modal for accessibility",
+      "Smooth open/close animation"
     ],
+    starterCode: {
+      html: "<button class=\"open-modal\" data-modal=\"modal-1\">Open Modal</button>\n\n<div id=\"modal-1\" class=\"modal-overlay\">\n  <div class=\"modal-content\">\n    <button class=\"modal-close\">&times;</button>\n    <h2>Modal Title</h2>\n    <p>This is the modal content. Build something great!</p>\n  </div>\n</div>",
+      css: ".modal-overlay {\n  position: fixed;\n  inset: 0;\n  background: rgba(0, 0, 0, 0.6);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity 0.2s, visibility 0.2s;\n}\n\n.modal-overlay.active {\n  opacity: 1;\n  visibility: visible;\n}\n\n.modal-content {\n  background: #1f2937;\n  border-radius: 12px;\n  padding: 32px;\n  max-width: 500px;\n  width: 90%;\n  position: relative;\n  transform: scale(0.9);\n  transition: transform 0.2s;\n}\n\n.modal-overlay.active .modal-content {\n  transform: scale(1);\n}\n\n.modal-close {\n  position: absolute;\n  top: 12px;\n  right: 16px;\n  font-size: 1.5rem;\n  background: none;\n  border: none;\n  color: #9ca3af;\n  cursor: pointer;\n}",
+      js: "// Build your modal system here\n"
+    },
     hints: [
-      "State machine for payment lifecycle prevents invalid transitions",
-      "Idempotency key + DB constraint = no double charges",
-      "Saga pattern for distributed transactions across services",
-      "Separate hot (recent) and cold (archive) transaction storage",
+      "Use visibility + opacity for smooth transitions",
+      "document.body.style.overflow = 'hidden' locks scroll",
+      "Listen for keydown event on document for Escape key"
+    ],
+    isPublished: true,
+  },
+  {
+    title: "Infinite Scroll Feed",
+    slug: "infinite-scroll-feed",
+    category: "feature",
+    description: "Build an infinite scrolling feed that loads more items as the user scrolls to the bottom.\n\nSimulate an API call with setTimeout and display cards with mock post data.",
+    difficulty: "medium",
+    tags: ["scroll", "async", "dom", "performance"],
+    timeLimit: 45,
+    requirements: [
+      "Initial load shows 10 items",
+      "Loading spinner appears when fetching more",
+      "New items load when user scrolls near bottom",
+      "Each item shows title, excerpt, and author",
+      "Handle loading state (prevent duplicate fetches)",
+      "Show 'No more posts' when all items loaded",
+      "Smooth scroll experience without janking",
+      "Use IntersectionObserver (not scroll event)"
+    ],
+    starterCode: {
+      html: "<div id=\"feed\">\n  <div id=\"posts\"></div>\n  <div id=\"loader\" class=\"loader\">Loading...</div>\n  <div id=\"end-message\" style=\"display:none\">No more posts</div>\n</div>",
+      css: "#feed {\n  max-width: 600px;\n  margin: 0 auto;\n  padding: 20px;\n}\n\n.post-card {\n  background: #1f2937;\n  border: 1px solid #374151;\n  border-radius: 12px;\n  padding: 20px;\n  margin-bottom: 16px;\n}\n\n.post-card h3 {\n  margin: 0 0 8px;\n  color: #f3f4f6;\n}\n\n.post-card p {\n  color: #9ca3af;\n  font-size: 0.9rem;\n  line-height: 1.5;\n}\n\n.post-card .author {\n  margin-top: 12px;\n  font-size: 0.8rem;\n  color: #6b7280;\n}\n\n.loader {\n  text-align: center;\n  padding: 20px;\n  color: #6b7280;\n}",
+      js: "// Mock data generator\nfunction generatePost(id) {\n  return {\n    id,\n    title: \"Post #\" + id,\n    excerpt: \"This is the content preview for post number \" + id + \". It contains some interesting text.\",\n    author: \"Author \" + Math.ceil(id / 3)\n  };\n}\n\n// Build your infinite scroll here\n"
+    },
+    hints: [
+      "IntersectionObserver on the loader element is cleaner than scroll events",
+      "Keep a page/offset counter and a 'loading' flag",
+      "Simulate API delay with setTimeout(resolve, 500)"
+    ],
+    isPublished: true,
+  },
+  {
+    title: "Drag and Drop Kanban Board",
+    slug: "drag-drop-kanban",
+    category: "mini-app",
+    description: "Build a Kanban board with three columns (Todo, In Progress, Done) where cards can be dragged between columns.\n\nUsers should also be able to add new cards to any column.",
+    difficulty: "hard",
+    tags: ["drag-drop", "dom", "state-management", "css-grid"],
+    timeLimit: 60,
+    requirements: [
+      "Three columns: Todo, In Progress, Done",
+      "Cards can be dragged between columns",
+      "Visual feedback during drag (ghost card, highlight target column)",
+      "Add new card button for each column",
+      "Delete card functionality",
+      "Card count shown per column",
+      "Cards persist in localStorage",
+      "Responsive layout (columns stack on mobile)"
+    ],
+    starterCode: {
+      html: "<div id=\"kanban\">\n  <div class=\"column\" data-status=\"todo\">\n    <h2>Todo <span class=\"count\">0</span></h2>\n    <div class=\"cards\"></div>\n    <button class=\"add-card\">+ Add Card</button>\n  </div>\n  <div class=\"column\" data-status=\"in-progress\">\n    <h2>In Progress <span class=\"count\">0</span></h2>\n    <div class=\"cards\"></div>\n    <button class=\"add-card\">+ Add Card</button>\n  </div>\n  <div class=\"column\" data-status=\"done\">\n    <h2>Done <span class=\"count\">0</span></h2>\n    <div class=\"cards\"></div>\n    <button class=\"add-card\">+ Add Card</button>\n  </div>\n</div>",
+      css: "#kanban {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 16px;\n  padding: 20px;\n  min-height: 80vh;\n}\n\n.column {\n  background: #111827;\n  border-radius: 12px;\n  padding: 16px;\n  border: 2px solid transparent;\n}\n\n.column.drag-over {\n  border-color: #6366f1;\n  background: #1e1b4b;\n}\n\n.column h2 {\n  font-size: 1rem;\n  margin-bottom: 12px;\n  display: flex;\n  justify-content: space-between;\n}\n\n.card {\n  background: #1f2937;\n  border: 1px solid #374151;\n  border-radius: 8px;\n  padding: 12px;\n  margin-bottom: 8px;\n  cursor: grab;\n}\n\n.card:active {\n  cursor: grabbing;\n}\n\n.card.dragging {\n  opacity: 0.5;\n}\n\n.add-card {\n  width: 100%;\n  padding: 8px;\n  background: transparent;\n  border: 1px dashed #4b5563;\n  border-radius: 8px;\n  color: #6b7280;\n  cursor: pointer;\n}\n\n@media (max-width: 768px) {\n  #kanban { grid-template-columns: 1fr; }\n}",
+      js: "// Build your Kanban board here\n"
+    },
+    hints: [
+      "Use HTML5 drag and drop API: dragstart, dragover, drop events",
+      "Set draggable='true' on cards",
+      "Use dataTransfer.setData to pass the card id during drag",
+      "Prevent default on dragover to allow dropping"
+    ],
+    isPublished: true,
+  },
+  {
+    title: "Form Validator",
+    slug: "form-validator",
+    category: "feature",
+    description: "Build a signup form with real-time client-side validation.\n\nValidate fields as the user types and show/hide error messages with proper styling.",
+    difficulty: "easy",
+    tags: ["forms", "validation", "dom", "regex"],
+    timeLimit: 30,
+    requirements: [
+      "Fields: Name, Email, Password, Confirm Password",
+      "Validate on blur and on submit",
+      "Name: minimum 3 characters",
+      "Email: valid email format",
+      "Password: min 8 chars, 1 uppercase, 1 number",
+      "Confirm Password: must match password",
+      "Show inline error messages below each field",
+      "Disable submit button until all fields are valid",
+      "Green border on valid fields, red on invalid",
+      "Show password strength indicator"
+    ],
+    starterCode: {
+      html: "<form id=\"signup-form\" novalidate>\n  <div class=\"form-group\">\n    <label for=\"name\">Full Name</label>\n    <input type=\"text\" id=\"name\" placeholder=\"John Doe\" />\n    <span class=\"error\"></span>\n  </div>\n  <div class=\"form-group\">\n    <label for=\"email\">Email</label>\n    <input type=\"email\" id=\"email\" placeholder=\"john@example.com\" />\n    <span class=\"error\"></span>\n  </div>\n  <div class=\"form-group\">\n    <label for=\"password\">Password</label>\n    <input type=\"password\" id=\"password\" placeholder=\"Min 8 characters\" />\n    <div id=\"strength\"></div>\n    <span class=\"error\"></span>\n  </div>\n  <div class=\"form-group\">\n    <label for=\"confirm\">Confirm Password</label>\n    <input type=\"password\" id=\"confirm\" placeholder=\"Repeat password\" />\n    <span class=\"error\"></span>\n  </div>\n  <button type=\"submit\" id=\"submit-btn\" disabled>Create Account</button>\n</form>",
+      css: "#signup-form {\n  max-width: 400px;\n  margin: 40px auto;\n}\n\n.form-group {\n  margin-bottom: 16px;\n}\n\nlabel {\n  display: block;\n  margin-bottom: 4px;\n  font-size: 0.875rem;\n  color: #d1d5db;\n}\n\ninput {\n  width: 100%;\n  padding: 10px 12px;\n  border: 1px solid #374151;\n  border-radius: 8px;\n  background: #1f2937;\n  color: white;\n  font-size: 0.9rem;\n}\n\ninput.valid { border-color: #22c55e; }\ninput.invalid { border-color: #ef4444; }\n\n.error {\n  display: block;\n  margin-top: 4px;\n  font-size: 0.75rem;\n  color: #ef4444;\n  min-height: 16px;\n}\n\n#submit-btn {\n  width: 100%;\n  padding: 12px;\n  background: #4f46e5;\n  color: white;\n  border: none;\n  border-radius: 8px;\n  cursor: pointer;\n  font-size: 1rem;\n}\n\n#submit-btn:disabled {\n  opacity: 0.5;\n  cursor: not-allowed;\n}",
+      js: "// Build your form validation here\n"
+    },
+    hints: [
+      "Use regex: /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/ for email",
+      "Listen for 'input' event for real-time validation",
+      "Check all fields validity to enable/disable submit button"
+    ],
+    isPublished: true,
+  },
+  {
+    title: "Image Carousel/Slider",
+    slug: "image-carousel",
+    category: "component",
+    description: "Build an image carousel that cycles through images with previous/next buttons and dot indicators.\n\nInclude auto-play functionality that pauses on hover.",
+    difficulty: "medium",
+    tags: ["css", "animation", "dom", "timer"],
+    timeLimit: 40,
+    requirements: [
+      "Display one image at a time with smooth transition",
+      "Previous and Next arrow buttons",
+      "Dot indicators showing current slide",
+      "Click dots to jump to specific slide",
+      "Auto-play every 3 seconds",
+      "Pause auto-play on hover",
+      "Infinite loop (wraps from last to first)",
+      "Swipe support for touch devices (optional bonus)"
+    ],
+    starterCode: {
+      html: "<div id=\"carousel\">\n  <div class=\"slides\">\n    <div class=\"slide active\" style=\"background: #4f46e5;\"><h2>Slide 1</h2></div>\n    <div class=\"slide\" style=\"background: #7c3aed;\"><h2>Slide 2</h2></div>\n    <div class=\"slide\" style=\"background: #2563eb;\"><h2>Slide 3</h2></div>\n    <div class=\"slide\" style=\"background: #059669;\"><h2>Slide 4</h2></div>\n  </div>\n  <button class=\"prev\">&larr;</button>\n  <button class=\"next\">&rarr;</button>\n  <div class=\"dots\"></div>\n</div>",
+      css: "#carousel {\n  position: relative;\n  max-width: 700px;\n  margin: 40px auto;\n  overflow: hidden;\n  border-radius: 12px;\n}\n\n.slides {\n  display: flex;\n  transition: transform 0.4s ease;\n}\n\n.slide {\n  min-width: 100%;\n  height: 350px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: white;\n  font-size: 2rem;\n}\n\n.prev, .next {\n  position: absolute;\n  top: 50%;\n  transform: translateY(-50%);\n  background: rgba(0,0,0,0.5);\n  color: white;\n  border: none;\n  padding: 12px 16px;\n  cursor: pointer;\n  font-size: 1.2rem;\n  border-radius: 4px;\n}\n\n.prev { left: 12px; }\n.next { right: 12px; }\n\n.dots {\n  text-align: center;\n  padding: 12px;\n}\n\n.dot {\n  display: inline-block;\n  width: 10px;\n  height: 10px;\n  border-radius: 50%;\n  background: #4b5563;\n  margin: 0 4px;\n  cursor: pointer;\n}\n\n.dot.active {\n  background: #6366f1;\n}",
+      js: "// Build your carousel here\n"
+    },
+    hints: [
+      "Use transform: translateX() on the slides container",
+      "Track currentIndex, update transform on each navigation",
+      "setInterval for auto-play, clearInterval on mouseenter"
+    ],
+    isPublished: true,
+  },
+  {
+    title: "Multi-step Checkout Form",
+    slug: "multi-step-form",
+    category: "mini-app",
+    description: "Build a multi-step form with progress indicator, validation per step, and a review step before submission.\n\nSteps: Personal Info -> Shipping Address -> Payment -> Review & Submit.",
+    difficulty: "hard",
+    tags: ["forms", "state-management", "dom", "validation"],
+    timeLimit: 60,
+    requirements: [
+      "4 steps with progress bar/stepper indicator",
+      "Step 1: Name, Email, Phone",
+      "Step 2: Address, City, Zip, Country",
+      "Step 3: Card Number, Expiry, CVV",
+      "Step 4: Review all entered data",
+      "Validate current step before allowing Next",
+      "Previous button to go back (preserving data)",
+      "Progress bar shows completion percentage",
+      "Final submit shows success message",
+      "Smooth step transition animation"
+    ],
+    starterCode: {
+      html: "<div id=\"multi-step-form\">\n  <div id=\"progress-bar\">\n    <div class=\"progress\"></div>\n  </div>\n  <div id=\"steps\"></div>\n  <div id=\"navigation\">\n    <button id=\"prev-btn\">Previous</button>\n    <button id=\"next-btn\">Next</button>\n  </div>\n</div>",
+      css: "#multi-step-form {\n  max-width: 500px;\n  margin: 40px auto;\n  background: #111827;\n  border-radius: 12px;\n  padding: 32px;\n}\n\n#progress-bar {\n  height: 4px;\n  background: #374151;\n  border-radius: 4px;\n  margin-bottom: 32px;\n}\n\n#progress-bar .progress {\n  height: 100%;\n  background: #6366f1;\n  border-radius: 4px;\n  transition: width 0.3s;\n}\n\n.step {\n  display: none;\n}\n\n.step.active {\n  display: block;\n}\n\n#navigation {\n  display: flex;\n  justify-content: space-between;\n  margin-top: 24px;\n}\n\n#navigation button {\n  padding: 10px 24px;\n  border-radius: 8px;\n  border: none;\n  cursor: pointer;\n  font-size: 0.9rem;\n}\n\n#prev-btn {\n  background: #374151;\n  color: #d1d5db;\n}\n\n#next-btn {\n  background: #4f46e5;\n  color: white;\n}",
+      js: "// Build your multi-step form here\n"
+    },
+    hints: [
+      "Keep all form data in a single object, update on each input change",
+      "Show/hide steps by toggling 'active' class",
+      "Update progress bar width as percentage: (currentStep / totalSteps) * 100"
+    ],
+    isPublished: true,
+  },
+  {
+    title: "CSS Grid Dashboard Layout",
+    slug: "css-grid-dashboard",
+    category: "layout",
+    description: "Build a responsive admin dashboard layout using CSS Grid.\n\nThe layout should include a sidebar, header, main content area with cards, and a footer. It should collapse to a single column on mobile.",
+    difficulty: "easy",
+    tags: ["css-grid", "responsive", "layout"],
+    timeLimit: 30,
+    requirements: [
+      "Fixed sidebar on the left (250px)",
+      "Header spanning the top of the main area",
+      "Content area with a grid of stat cards",
+      "Footer at the bottom",
+      "Sidebar collapses on screens < 768px",
+      "Cards reflow from 3 columns to 2 to 1",
+      "Sidebar has navigation links",
+      "Smooth transition on responsive breakpoints"
+    ],
+    starterCode: {
+      html: "<div class=\"dashboard\">\n  <aside class=\"sidebar\">\n    <h2>Dashboard</h2>\n    <nav>\n      <a href=\"#\" class=\"active\">Overview</a>\n      <a href=\"#\">Analytics</a>\n      <a href=\"#\">Users</a>\n      <a href=\"#\">Settings</a>\n    </nav>\n  </aside>\n  <header class=\"topbar\">Welcome back, Admin</header>\n  <main class=\"content\">\n    <div class=\"card\">Users: 1,234</div>\n    <div class=\"card\">Revenue: ,345</div>\n    <div class=\"card\">Orders: 567</div>\n    <div class=\"card\">Growth: +12%</div>\n    <div class=\"card\">Active: 89%</div>\n    <div class=\"card\">Support: 23 tickets</div>\n  </main>\n  <footer class=\"footer\">Dashboard v1.0</footer>\n</div>",
+      css: "/* Build your grid layout here */\n\n.dashboard {\n  min-height: 100vh;\n}\n\n.sidebar {\n  background: #111827;\n  padding: 20px;\n}\n\n.sidebar nav a {\n  display: block;\n  padding: 10px;\n  color: #9ca3af;\n  text-decoration: none;\n  border-radius: 6px;\n  margin-bottom: 4px;\n}\n\n.sidebar nav a.active {\n  background: #1f2937;\n  color: white;\n}\n\n.topbar {\n  background: #1f2937;\n  padding: 16px 24px;\n  border-bottom: 1px solid #374151;\n}\n\n.content {\n  padding: 24px;\n}\n\n.card {\n  background: #1f2937;\n  border: 1px solid #374151;\n  border-radius: 12px;\n  padding: 24px;\n  text-align: center;\n  font-size: 1.1rem;\n}\n\n.footer {\n  padding: 16px 24px;\n  text-align: center;\n  color: #6b7280;\n  border-top: 1px solid #374151;\n}",
+      js: "// No JS needed for this layout challenge\n// Focus on CSS Grid to create the responsive layout\n"
+    },
+    hints: [
+      "Use grid-template-areas for semantic layout",
+      "grid-template-columns: 250px 1fr for sidebar + main",
+      "Use @media (max-width: 768px) to switch to single column"
+    ],
+    isPublished: true,
+  },
+  {
+    title: "Debounced Live Search with API",
+    slug: "debounced-live-search",
+    category: "feature",
+    description: "Build a search interface that calls a mock API with debouncing, shows loading state, and renders results as cards.\n\nSimulate network latency and handle race conditions.",
+    difficulty: "medium",
+    tags: ["async", "debounce", "promises", "dom"],
+    timeLimit: 45,
+    requirements: [
+      "Search input with 300ms debounce",
+      "Loading spinner while fetching",
+      "Display results as cards with title and description",
+      "Handle empty query (clear results)",
+      "Handle no results state",
+      "Cancel previous pending request on new keystroke",
+      "Minimum 2 characters before searching",
+      "Show total result count"
+    ],
+    starterCode: {
+      html: "<div id=\"search-app\">\n  <input id=\"query\" type=\"text\" placeholder=\"Search articles...\" />\n  <div id=\"status\"></div>\n  <div id=\"results\"></div>\n</div>",
+      css: "#search-app {\n  max-width: 600px;\n  margin: 40px auto;\n}\n\n#query {\n  width: 100%;\n  padding: 14px 18px;\n  font-size: 1rem;\n  border: 1px solid #374151;\n  border-radius: 10px;\n  background: #1f2937;\n  color: white;\n}\n\n#status {\n  padding: 12px 0;\n  color: #6b7280;\n  font-size: 0.9rem;\n}\n\n.result-card {\n  background: #1f2937;\n  border: 1px solid #374151;\n  border-radius: 10px;\n  padding: 16px;\n  margin-bottom: 12px;\n}\n\n.result-card h3 {\n  color: #f3f4f6;\n  margin: 0 0 6px;\n}\n\n.result-card p {\n  color: #9ca3af;\n  font-size: 0.85rem;\n  margin: 0;\n}",
+      js: "// Mock API - simulates network latency\nconst articles = [\n  { title: \"Understanding Closures in JavaScript\", desc: \"A deep dive into closures and lexical scope\" },\n  { title: \"CSS Grid vs Flexbox\", desc: \"When to use grid and when to use flexbox\" },\n  { title: \"React Hooks Explained\", desc: \"useState, useEffect, and custom hooks\" },\n  { title: \"Building REST APIs with Node.js\", desc: \"Express, middleware, and routing\" },\n  { title: \"TypeScript for Beginners\", desc: \"Types, interfaces, and generics\" },\n  { title: \"Web Performance Optimization\", desc: \"Lazy loading, code splitting, caching\" },\n  { title: \"Responsive Design Patterns\", desc: \"Mobile-first, fluid grids, breakpoints\" },\n  { title: \"Testing with Jest\", desc: \"Unit tests, mocks, and coverage\" },\n];\n\nfunction mockFetch(query) {\n  return new Promise((resolve) => {\n    setTimeout(() => {\n      const results = articles.filter(a =>\n        a.title.toLowerCase().includes(query.toLowerCase())\n      );\n      resolve(results);\n    }, 300 + Math.random() * 500);\n  });\n}\n\n// Build your debounced search here\n"
+    },
+    hints: [
+      "Use AbortController or a request ID to handle race conditions",
+      "clearTimeout on each new keystroke for debounce",
+      "Track a requestId counter - ignore responses from stale requests"
     ],
     isPublished: true,
   },
@@ -663,18 +374,18 @@ async function seed() {
   console.log("[seed] cleared existing problems");
 
   const inserted = await Problem.insertMany(problems);
-  console.log(`[seed] inserted ${inserted.length} problems:`);
+  console.log("[seed] inserted " + inserted.length + " problems:");
 
-  const grouped = { dsa: [], "machine-coding": [], hld: [] };
+  const grouped = {};
   for (const p of inserted) {
-    grouped[p.type] = grouped[p.type] || [];
-    grouped[p.type].push(p);
+    grouped[p.category] = grouped[p.category] || [];
+    grouped[p.category].push(p);
   }
 
-  for (const [type, items] of Object.entries(grouped)) {
-    console.log(`\n  ${type.toUpperCase()} (${items.length}):`);
+  for (const [category, items] of Object.entries(grouped)) {
+    console.log("\n  " + category.toUpperCase() + " (" + items.length + "):");
     for (const p of items) {
-      console.log(`    [${p.difficulty}] ${p.title}`);
+      console.log("    [" + p.difficulty + "] " + p.title);
     }
   }
 
