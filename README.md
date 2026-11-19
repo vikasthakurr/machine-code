@@ -1,25 +1,25 @@
 # machine-code
 
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
 
 ![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=flat-square) 
 ![GitHub stars](https://img.shields.io/github/stars/vikasthakurr/machine-code?style=flat-square) 
 ![GitHub forks](https://img.shields.io/github/forks/vikasthakurr/machine-code?style=flat-square)
 
-## 📌 Overview
+## Overview
 
 Full-stack machine coding interview practice platform featuring real-time code evaluation, sandboxed execution, and Google OAuth.
 
 **Tags:** `#machine-coding` `#system-design` `#code-editor` `#docker` `#react` `#nodejs`
 
-## 🚀 Key Highlights & Concepts
+## Key Highlights & Concepts
 
 - **Clean Architecture:** Semantic structuring, modular components, and maintainable codebase.
 - **Responsive Design:** Fluid UX optimized across mobile, tablet, and desktop viewports.
 - **Modern Standards:** Built following the latest web development standards and best practices.
 
-## 🛠️ Getting Started
+## Getting Started
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (v16+ or v18+ recommended)
@@ -42,28 +42,26 @@ Full-stack machine coding interview practice platform featuring real-time code e
    npm run dev # or npm start
    ```
 
-## 📂 Repository Structure
+## Repository Structure
 ```text
 machine-code/
-├── .github
-├── .gitignore
-├── CONTRIBUTING.md
-├── LICENSE
-├── README.md
-├── docker-compose.yml
-├── infra
-├── package.json
-├── packages
-├── services
+ .github
+ .gitignore
+ CONTRIBUTING.md
+ LICENSE
+ README.md
+ docker-compose.yml
+ infra
+ package.json
+ packages
+ services
 ```
 
 ---
 
-## 👨‍💻 Author
+## Author
 
 **Vikas Thakur**  
 - **LinkedIn:** [@vikasthakurr](https://www.linkedin.com/in/vikasthakurr)  
 - **Twitter / X:** [@vikasthaakurr](https://twitter.com/vikasthaakurr)  
-- **GitHub:** [@vikasthakurr](https://github.com/vikasthakurr)  
-
-⭐ *If you find this repository helpful or educational, feel free to give it a star!*
+- **GitHub:** [@vikasthakurr](https://github.com/vikasthakurr)
