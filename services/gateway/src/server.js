@@ -43,6 +43,23 @@ app.get("/health", (_req, res) =>
   res.json({ status: "ok", service: "gateway" }),
 );
 
+// start Point When Request on /
+app.get("/", (_req, res) => {
+  res.json({
+    name: "DevPractice API Gateway",
+    version: "1.0.0",
+    status: "healthy",
+    environment: env.NODE_ENV,
+    endpoints: {
+      auth: "/api/v1/auth",
+      problems: "/api/v1/problems",
+      submissions: "/api/v1/submissions",
+      execution: "/api/v1/execution",
+      notifications: "/api/v1/notifications",
+    },
+  });
+});
+
 // Route definitions: path prefix → target service
 const routes = [
   { path: "/api/v1/auth", target: env.AUTH_SERVICE_URL, limiter: authLimiter },
