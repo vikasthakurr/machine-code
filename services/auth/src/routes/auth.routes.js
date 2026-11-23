@@ -4,7 +4,7 @@ import { Router } from "express";
 import passport from "passport";
 import { env } from "../config/env.js";
 import { googleCallback, login } from "../controllers/login.controller.js";
-import { updateProfile } from "../controllers/profile.controller.js";
+import { updateProfile,getProfile } from "../controllers/profile.controller.js";
 import { register } from "../controllers/register.controller.js";
 import {
   loginSchema,
@@ -20,6 +20,7 @@ const auth = authenticate(env.JWT_SECRET);
 router.post("/register", validate(registerSchema), register);
 router.post("/login", validate(loginSchema), login);
 router.patch("/profile", auth, validate(updateProfileSchema), updateProfile);
+router.get('/profile', auth, getProfile);
 
 // google oauth
 router.get(
